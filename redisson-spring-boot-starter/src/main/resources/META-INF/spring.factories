@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+sharedkube.redisson.starter.MultiRedissonsAutoConfiguration
