@@ -220,6 +220,8 @@ public class RedissonProperties {
             .setDnsMonitoringInterval(sharedkubeBaseMasterSlaveServersConfig.getDnsMonitoringInterval())
             .setFailedSlaveCheckInterval(sharedkubeBaseMasterSlaveServersConfig.getFailedSlaveCheckInterval())
             .setFailedSlaveReconnectionInterval(sharedkubeBaseMasterSlaveServersConfig.getFailedSlaveReconnectionInterval());
+        //
+        initRedissonBaseConfig(redissonBaseMasterSlaveServersConfig, sharedkubeBaseMasterSlaveServersConfig);
     }
 
     private void initRedissonMasterSlaveServersConfig(Config config) {
