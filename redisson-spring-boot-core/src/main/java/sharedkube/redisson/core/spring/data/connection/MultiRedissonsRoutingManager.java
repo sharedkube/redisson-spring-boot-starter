@@ -8,6 +8,12 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * manage multi-redissons routing rules
+ * 
+ * @author houyehua
+ *
+ */
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MultiRedissonsRoutingManager implements AutoCloseable {

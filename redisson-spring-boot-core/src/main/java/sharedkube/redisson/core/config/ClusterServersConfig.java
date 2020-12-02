@@ -1,7 +1,6 @@
 package sharedkube.redisson.core.config;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.redisson.api.NatMapper;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -16,10 +15,12 @@ import lombok.Setter;
 @Setter
 public class ClusterServersConfig extends BaseMasterSlaveServersConfig {
 
+    private NatMapper natMapper = NatMapper.direct();
+
     /**
      * Redis cluster node urls list
      */
-    private List<String> nodeAddresses = new ArrayList<>();
+    private String[] nodeAddresses = {};
 
     /**
      * Redis cluster scan interval in milliseconds

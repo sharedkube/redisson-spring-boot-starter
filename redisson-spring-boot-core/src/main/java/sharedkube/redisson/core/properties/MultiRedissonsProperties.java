@@ -1,5 +1,6 @@
 package sharedkube.redisson.core.properties;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -18,8 +19,14 @@ public class MultiRedissonsProperties {
 
     private boolean enabled = true;
 
+    /**
+     * the name of default redisson instance.
+     */
     private String defaultRedisson;
 
-    private Map<String, RedissonProperties> redissons;
+    /**
+     * multi redisson instance configuration.
+     */
+    private Map<String, RedissonProperties> redissons = new LinkedHashMap<>();
 
 }

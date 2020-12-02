@@ -28,6 +28,7 @@ import org.redisson.api.RDeque;
 import org.redisson.api.RDoubleAdder;
 import org.redisson.api.RGeo;
 import org.redisson.api.RHyperLogLog;
+import org.redisson.api.RIdGenerator;
 import org.redisson.api.RKeys;
 import org.redisson.api.RLexSortedSet;
 import org.redisson.api.RList;
@@ -48,6 +49,7 @@ import org.redisson.api.RPriorityQueue;
 import org.redisson.api.RQueue;
 import org.redisson.api.RRateLimiter;
 import org.redisson.api.RReadWriteLock;
+import org.redisson.api.RReliableTopic;
 import org.redisson.api.RRemoteService;
 import org.redisson.api.RRingBuffer;
 import org.redisson.api.RScheduledExecutorService;
@@ -87,15 +89,21 @@ public class MultiRedissons implements RedissonClient {
         this.redissonClientMap = redissonClientMap;
     }
 
+    /**
+     * 
+     * get a redisson client from multi-redissons map according to a routing key managed by
+     * MultiRedissonsRoutingManager.
+     * 
+     * @return RedissonClient
+     */
     public RedissonClient getRedissonClient() {
 
         String routingKey = Optional.ofNullable(MultiRedissonsRoutingManager.getRoutingKey()).orElse(defaultRedisson);
-        RedissonClient redissonClient = redissonClientMap.get(routingKey);
-
         if (log.isDebugEnabled()) {
-            log.debug("redis routing to '{}'", routingKey);
+            log.debug("redisson route to '{}'", routingKey);
         }
 
+        RedissonClient redissonClient = redissonClientMap.get(routingKey);
         if (redissonClient == null) {
             throw new MultiRedissionsNotFoundException(String.format("'%s' instance not found", routingKey));
         }
@@ -103,10 +111,10 @@ public class MultiRedissons implements RedissonClient {
         return redissonClient;
     }
 
-    public RedissonClient getRedissonClient(String instance) {
+    public RedissonClient getRedissonClient(String routingKey) {
 
-        RedissonClient redissonClient = redissonClientMap.get(instance);
-        Assert.notNull(redissonClient, String.format("'%s' instance not found", instance));
+        RedissonClient redissonClient = redissonClientMap.get(routingKey);
+        Assert.notNull(redissonClient, String.format("'%s' instance not found", routingKey));
         return redissonClient;
     }
 
@@ -118,7 +126,7 @@ public class MultiRedissons implements RedissonClient {
     @Override
     public void shutdown(long quietPeriod, long timeout, TimeUnit unit) {
         if (log.isInfoEnabled()) {
-            log.info("now to shut down multi redisson client quietPeriod {} timeout {} unit {}", quietPeriod, timeout,
+            log.info("now to shut down multi redisson client quiet period {} timeout {} unit {}", quietPeriod, timeout,
                 unit);
         }
         for (Map.Entry<String, RedissonClient> entry : redissonClientMap.entrySet()) {
@@ -674,5 +682,20 @@ public class MultiRedissons implements RedissonClient {
     @Override
     public String getId() {
         return getRedissonClient().getId();
+    }
+
+    @Override
+    public RReliableTopic getReliableTopic(String name) {
+        return getRedissonClient().getReliableTopic(name);
+    }
+
+    @Override
+    public RReliableTopic getReliableTopic(String name, Codec codec) {
+        return getRedissonClient().getReliableTopic(name, codec);
+    }
+
+    @Override
+    public RIdGenerator getIdGenerator(String name) {
+        return getRedissonClient().getIdGenerator(name);
     }
 }

@@ -1,6 +1,5 @@
 package sharedkube.redisson.starter;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.redisson.Redisson;
@@ -20,6 +19,7 @@ import org.springframework.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import sharedkube.redisson.core.api.MultiRedissons;
 import sharedkube.redisson.core.properties.MultiRedissonsProperties;
+import sharedkube.redisson.core.spring.data.connection.MultiRedissonsCreator;
 import sharedkube.redisson.core.spring.data.connection.MutilRedissonsConnectionFactory;
 
 @Slf4j
@@ -31,26 +31,34 @@ import sharedkube.redisson.core.spring.data.connection.MutilRedissonsConnectionF
 public class MultiRedissonsAutoConfiguration {
 
     private String defaultRedisson;
-    private Map<String, RedisConnectionFactory> redisConnectionFactoryMap = new LinkedHashMap<>();
-    private Map<String, RedissonClient> redissonClientMap = new LinkedHashMap<>();
+    private Map<String, RedissonClient> redissonClientMap;
+    private Map<String, RedisConnectionFactory> redisConnectionFactoryMap;
 
     public MultiRedissonsAutoConfiguration(MultiRedissonsProperties properties) {
 
         if (log.isDebugEnabled()) {
-            log.debug("MultiRedissonsAutoConfiguration init ...");
+            log.debug("MultiRedissonsAutoConfiguration start init. MultiRedissonsProperties {}", properties);
         }
-        Assert.isTrue(!StringUtils.isEmpty(properties.getDefaultRedisson()),
-            "The default redisson value must be present");
-    }
 
-    @Bean
-    public RedisConnectionFactory redisConnectionFactory() {
-        return new MutilRedissonsConnectionFactory(defaultRedisson, redisConnectionFactoryMap);
+        this.defaultRedisson = properties.getDefaultRedisson();
+        // check
+        Assert.isTrue(!StringUtils.isEmpty(defaultRedisson), "The default redisson's name must be present");
+        Assert.isTrue(properties.getRedissons().containsKey(defaultRedisson),
+            "The default redisson instance configuration must be present");
+
+        // init
+        this.redissonClientMap = MultiRedissonsCreator.createRedissonClientMap(properties);
+        this.redisConnectionFactoryMap = MultiRedissonsCreator.createRedisConnectionFactoryMap(redissonClientMap);
     }
 
     @Bean(destroyMethod = "shutdown")
     public RedissonClient redissonClient() {
         return new MultiRedissons(defaultRedisson, redissonClientMap);
+    }
+
+    @Bean
+    public RedisConnectionFactory redisConnectionFactory() {
+        return new MutilRedissonsConnectionFactory(defaultRedisson, redisConnectionFactoryMap);
     }
 
 }

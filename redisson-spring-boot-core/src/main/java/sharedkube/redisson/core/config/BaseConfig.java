@@ -70,7 +70,7 @@ public class BaseConfig {
 
     private String sslKeystorePassword;
 
-    private int pingConnectionInterval;
+    private int pingConnectionInterval = 30000;
 
     private boolean keepAlive;
 

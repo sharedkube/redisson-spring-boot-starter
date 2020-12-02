@@ -1,8 +1,5 @@
 package sharedkube.redisson.core.config;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,7 +10,7 @@ public class ReplicatedServersConfig extends BaseMasterSlaveServersConfig {
     /**
      * Replication group node urls list
      */
-    private List<String> nodeAddresses = new ArrayList<>();
+    private String[] nodeAddresses = {};
 
     /**
      * Replication group scan interval in milliseconds, default 1000 ms
